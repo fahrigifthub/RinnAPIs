@@ -29,62 +29,74 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #64748b; }
         .dark ::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* Mencegah highlight biru saat klik cepat pada tombol */
+        .no-tap-highlight {
+            -webkit-tap-highlight-color: transparent;
+        }
     </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex bg-gray-100 text-gray-800 dark:bg-[#090D16] dark:text-gray-300 transition-colors duration-200 select-none">
+<body class="h-screen w-screen overflow-hidden flex bg-gray-100 text-gray-800 dark:bg-[#090D16] dark:text-gray-300 transition-colors duration-300 select-none">
 
-    <!-- SIDEBAR -->
-    <aside class="w-72 shrink-0 bg-white dark:bg-[#0E131F] border-r border-gray-200 dark:border-gray-800 flex flex-col transition-colors duration-200 z-10">
+    <!-- SIDEBAR (Ditutup Secara Default) -->
+    <aside id="sidebar-panel" class="w-0 overflow-hidden shrink-0 bg-white dark:bg-[#0E131F] flex flex-col transition-all duration-300 z-10 border-gray-200 dark:border-gray-800 border-r-0">
         
         <!-- Header Sidebar -->
-        <div class="h-[72px] flex items-center px-6 border-b border-gray-200 dark:border-gray-800 shrink-0">
+        <div class="h-[72px] flex items-center px-6 border-b border-gray-100 dark:border-gray-800 shrink-0">
             <div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
                 <h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">RinnAPIs</h1>
             </div>
         </div>
 
         <!-- Kolom Pencarian -->
-        <div class="p-4 border-b border-gray-200 dark:border-gray-800 shrink-0 bg-gray-50/50 dark:bg-[#0B0F19]/30">
+        <div class="p-4 shrink-0">
             <div class="relative">
-                <input type="text" id="search-input" placeholder="Cari di sini..." 
-                    class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 focus:border-gray-400 dark:focus:border-gray-600 text-xs rounded-none outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600">
+                <input type="text" id="search-input" placeholder="Cari endpoint..." 
+                    class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 focus:border-blue-400 dark:focus:border-blue-500 text-xs rounded-lg outline-none transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600">
             </div>
         </div>
 
-        <!-- Menu Pilihan Kategori -->
-        <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-1" id="sidebar-menu">
-            <button onclick="renderDashboard()" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-none transition-all text-left border border-transparent">
-                Menu Utama
+        <!-- Menu Pilihan Kategori (UI Baru) -->
+        <div class="flex-1 overflow-y-auto pb-4 flex flex-col" id="sidebar-menu">
+            <div class="px-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Navigasi</div>
+            <button onclick="renderDashboard()" id="nav-dashboard" class="nav-btn mx-3 mb-4 px-3 py-2 text-xs font-bold rounded-lg transition-all text-left flex items-center gap-2">
+                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard
             </button>
-            <div class="my-2 border-t border-gray-200 dark:border-gray-800"></div>
-            <div class="px-3 text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-wider mb-1">Daftar Kategori</div>
+            
+            <div class="px-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Kategori API</div>
+            <div id="category-list" class="flex flex-col gap-1">
+                <!-- Kategori dari JS -->
+            </div>
         </div>
 
-        <!-- Tombol Ganti Tema -->
-        <div class="p-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-[#0B0F19]/30 shrink-0">
-            <button onclick="toggleTheme()" class="w-full flex items-center justify-center gap-2 py-2 border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all text-xs font-medium rounded-none">
-                Ganti Mode Tampilan
-            </button>
+        <!-- Bagian Footer Kaki Sidebar -->
+        <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-transparent shrink-0 text-center text-[10px] text-gray-400 dark:text-gray-600 tracking-widest font-bold">
+            2026 - RinnAPIs.
         </div>
     </aside>
 
     <!-- KONTEN UTAMA -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden">
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
         
         <!-- Bagian Atas Header Konten -->
-        <header class="h-[72px] flex items-center justify-between px-8 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0E131F] shrink-0">
-            <div class="flex items-center gap-2 text-xs">
-                <span class="text-gray-400 dark:text-gray-600">Halaman:</span>
-                <span id="content-title" class="font-bold text-gray-900 dark:text-white tracking-wider">Menu Utama</span>
-            </div>
-            <div class="text-[11px] text-gray-400 dark:text-gray-600">
-                Status: Normal
+        <header class="h-[72px] flex items-center justify-between px-6 lg:px-8 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#0E131F]/80 backdrop-blur-md shrink-0 z-20">
+            <div class="flex items-center gap-4 text-xs">
+                <!-- Tombol Buka Tutup Menu Sidebar -->
+                <button onclick="toggleSidebar()" class="no-tap-highlight p-2 -ml-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 font-bold text-gray-600 dark:text-gray-400 transition-colors flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <div class="flex items-center gap-2">
+                    <span class="text-gray-400 dark:text-gray-500 hidden sm:inline">Halaman:</span>
+                    <span id="content-title" class="font-bold text-gray-900 dark:text-white tracking-wider">Dashboard Utama</span>
+                </div>
             </div>
         </header>
 
         <!-- Area Isi Konten (Bisa Di-scroll) -->
         <div class="flex-1 overflow-y-auto p-6 lg:p-8 bg-gray-50 dark:bg-[#090D16]" id="main-scroll">
-            <div id="content-body" class="w-full max-w-5xl mx-auto flex flex-col gap-4">
+            <div id="content-body" class="w-full max-w-4xl mx-auto flex flex-col gap-5">
                 <!-- Konten utama akan muncul di sini -->
             </div>
         </div>
@@ -94,80 +106,109 @@
         let allAPIs = [];
         let globalGroupedAPIs = {};
 
-        // Pengaturan Tema Terang/Gelap
-        if (localStorage.getItem('theme') === 'light') {
+        // Pengaturan Tema Otomatis (Jika OS Dark Mode, akan ikut dark)
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
             document.documentElement.classList.remove('dark');
         }
 
-        function toggleTheme() {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
+        // Fungsi Buka-Tutup Menu Panel Sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-panel');
+            if (sidebar.classList.contains('w-72')) {
+                sidebar.classList.remove('w-72', 'border-r');
+                sidebar.classList.add('w-0', 'border-r-0');
             } else {
-                html.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
+                sidebar.classList.remove('w-0', 'border-r-0');
+                sidebar.classList.add('w-72', 'border-r');
             }
         }
 
         // Tandai Menu yang Sedang Aktif
         function setActiveMenu(activeId) {
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-gray-200', 'text-gray-900', 'dark:bg-gray-800/60', 'dark:text-white', 'border-gray-300', 'dark:border-gray-700');
-                btn.classList.add('text-gray-500', 'dark:text-gray-500', 'hover:bg-gray-100', 'dark:hover:bg-gray-900/40', 'border-transparent');
+                btn.classList.remove('bg-gray-200', 'text-gray-900', 'dark:bg-gray-800', 'dark:text-white');
+                btn.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:bg-gray-100', 'dark:hover:bg-gray-800/50');
             });
             const activeBtn = document.getElementById(activeId);
             if(activeBtn) {
-                activeBtn.classList.remove('text-gray-500', 'dark:text-gray-500', 'hover:bg-gray-100', 'dark:hover:bg-gray-900/40', 'border-transparent');
-                activeBtn.classList.add('bg-gray-200', 'text-gray-900', 'dark:bg-gray-800/60', 'dark:text-white', 'border-gray-300', 'dark:border-gray-700');
+                activeBtn.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:bg-gray-100', 'dark:hover:bg-gray-800/50');
+                activeBtn.classList.add('bg-gray-200', 'text-gray-900', 'dark:bg-gray-800', 'dark:text-white');
             }
+        }
+
+        // Fungsi untuk memberikan Highlight Warna pada Kode JSON
+        function syntaxHighlight(json) {
+            if (typeof json != 'string') {
+                json = JSON.stringify(json, undefined, 2);
+            }
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'text-blue-500 dark:text-blue-400'; // number
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'text-purple-600 dark:text-purple-400'; // key
+                    } else {
+                        cls = 'text-green-600 dark:text-green-400'; // string
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'text-orange-500 dark:text-orange-400'; // boolean
+                } else if (/null/.test(match)) {
+                    cls = 'text-red-500 dark:text-red-400'; // null
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
         }
 
         // Loading Animasi Sementara
         function renderSkeleton() {
             const contentBody = document.getElementById('content-body');
             contentBody.innerHTML = `
-                <div class="w-full bg-white dark:bg-[#0E131F] border border-gray-200 dark:border-gray-800 p-5 animate-pulse">
-                    <div class="h-4 bg-gray-200 dark:bg-gray-800 w-1/4 mb-3"></div>
-                    <div class="h-3 bg-gray-200 dark:bg-gray-800 w-1/2"></div>
+                <div class="w-full bg-white dark:bg-[#0E131F] rounded-xl border border-gray-200 dark:border-gray-800 p-5 animate-pulse">
+                    <div class="h-4 bg-gray-200 dark:bg-gray-800 w-1/4 mb-4 rounded"></div>
+                    <div class="h-3 bg-gray-200 dark:bg-gray-800 w-1/2 rounded"></div>
                 </div>
             `;
         }
 
-        // Tampilan Awal (Dashboard Overview)
+        // Tampilan Awal Dashboard
         function renderDashboard() {
             setActiveMenu('nav-dashboard');
-            document.getElementById('content-title').innerText = "Menu Utama";
+            document.getElementById('content-title').innerText = "Dashboard Utama";
             const contentBody = document.getElementById('content-body');
             
             const totalAPIs = allAPIs.length;
             const totalCategories = Object.keys(globalGroupedAPIs).length;
 
             contentBody.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white dark:bg-[#0E131F] border border-gray-200 dark:border-gray-800 p-5">
-                        <div class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Total Fitur</div>
-                        <div class="text-3xl font-bold text-gray-900 dark:text-white">${totalAPIs}</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="bg-white dark:bg-[#0E131F] rounded-xl border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-center shadow-sm">
+                        <div class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-2">Total Endpoint API</div>
+                        <div class="text-4xl font-bold text-gray-900 dark:text-white">${totalAPIs}</div>
                     </div>
-                    <div class="bg-white dark:bg-[#0E131F] border border-gray-200 dark:border-gray-800 p-5">
-                        <div class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Total Kategori</div>
-                        <div class="text-3xl font-bold text-gray-900 dark:text-white">${totalCategories}</div>
+                    <div class="bg-white dark:bg-[#0E131F] rounded-xl border border-gray-200 dark:border-gray-800 p-6 flex flex-col justify-center shadow-sm">
+                        <div class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-2">Total Kategori</div>
+                        <div class="text-4xl font-bold text-gray-900 dark:text-white">${totalCategories}</div>
                     </div>
                 </div>
                 
-                <div class="bg-white dark:bg-[#0E131F] border border-gray-200 dark:border-gray-800 p-6">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white mb-2">Selamat Datang di RinnAPIs 🎉</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">
-                        Silakan gunakan menu di panel kiri untuk memilih kategori, atau cari langsung lewat kolom pencarian di atas untuk menemukan data yang diinginkan dengan cepat.
+                <div class="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-[#0E131F] dark:to-gray-900 rounded-xl border border-gray-800 p-8 shadow-sm">
+                    <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                        <span>Selamat Datang di RinnAPIs</span>
+                        <span class="text-xl">🚀</span>
+                    </h3>
+                    <p class="text-gray-400 text-xs leading-relaxed max-w-2xl">
+                        Akses berbagai macam API dengan mudah. Silakan buka menu navigasi di pojok kiri atas untuk melihat kategori yang tersedia atau mencari fitur yang Anda butuhkan.
                     </p>
                 </div>
             `;
         }
 
-        // Ganti Halaman Sesuai Kategori yang Diklik
+        // Ganti Halaman Sesuai Kategori
         function renderCategory(type, id) {
             setActiveMenu(id);
-            document.getElementById('content-title').innerText = type;
+            document.getElementById('content-title').innerText = `Kategori: ${type}`;
             const apis = globalGroupedAPIs[type] || [];
             renderAPIList(apis);
         }
@@ -179,39 +220,60 @@
             
             if (detailBox.classList.contains('hidden')) {
                 detailBox.classList.remove('hidden');
-                arrow.style.transform = 'rotate(90deg)';
+                arrow.style.transform = 'rotate(180deg)';
+                // Inisiasi awal URL curl
+                updateCurl(index);
             } else {
                 detailBox.classList.add('hidden');
                 arrow.style.transform = 'rotate(0deg)';
             }
         }
 
-        // Fungsi Menyalin Teks Hasil API ke Clipboard
-        function copyToClipboard(text, btnId) {
+        // Update URL cURL secara Real-time berdasarkan input
+        function updateCurl(index) {
+            const form = document.getElementById(`form-${index}`);
+            const curlCode = document.getElementById(`curl-code-${index}`);
+            const endpoint = form.getAttribute('data-endpoint');
+            
+            const inputs = form.querySelectorAll('input');
+            const queryParams = new URLSearchParams();
+            
+            inputs.forEach(input => {
+                if (input.value.trim() !== '') {
+                    queryParams.append(input.name, input.value.trim());
+                }
+            });
+            
+            const baseUrl = window.location.origin.replace(/\/$/, ""); 
+            const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+            const fullUrl = `${baseUrl}${endpoint}${queryString}`;
+            
+            curlCode.innerText = `curl -X GET "${fullUrl}" \\
+  -H "Accept: application/json"`;
+        }
+
+        // Fungsi Menyalin Teks ke Clipboard
+        function copyText(text, btnId, originalText = "SALIN") {
             navigator.clipboard.writeText(text).then(() => {
                 const copyBtn = document.getElementById(btnId);
                 copyBtn.innerText = "TERSALIN!";
-                copyBtn.classList.remove('text-gray-400', 'dark:text-gray-500');
-                copyBtn.classList.add('text-green-600', 'dark:text-green-400');
+                copyBtn.classList.add('text-green-500');
                 
                 setTimeout(() => {
-                    copyBtn.innerText = "SALIN";
-                    copyBtn.classList.remove('text-green-600', 'dark:text-green-400');
-                    copyBtn.classList.add('text-gray-400', 'dark:text-gray-500');
+                    copyBtn.innerText = originalText;
+                    copyBtn.classList.remove('text-green-500');
                 }, 2000);
-            }).catch(err => {
-                console.error('Gagal menyalin: ', err);
             });
         }
 
-        // MENAMPILKAN DAFTAR API (1 Layout Utuh per API dengan fitur Buka-Tutup)
+        // Render Daftar API
         function renderAPIList(apis) {
             const contentBody = document.getElementById('content-body');
             contentBody.innerHTML = '';
 
             if(apis.length === 0) {
                 contentBody.innerHTML = `
-                    <div class="border border-dashed border-gray-300 dark:border-gray-800 p-8 text-center text-xs text-gray-400">
+                    <div class="border border-dashed rounded-xl border-gray-300 dark:border-gray-800 p-10 text-center text-xs text-gray-400">
                         Tidak ada data yang ditemukan.
                     </div>`;
                 return;
@@ -222,62 +284,85 @@
                 const resultId = `result-${index}`;
                 const resultWrapId = `result-wrap-${index}`;
                 const copyBtnId = `copy-btn-${index}`;
+                const copyCurlBtnId = `copy-curl-btn-${index}`;
+                const statusBadgeId = `status-${index}`;
                 
-                // Membuat form input dinamis berdasarkan parameter api
+                // Form Parameter
                 let inputFields = '';
-                api.params.forEach(param => {
-                    inputFields += `
-                        <div class="mb-3">
-                            <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-500 mb-1 uppercase">Parameter: ${param}</label>
-                            <input type="text" name="${param}" placeholder="Isi di sini..." 
-                            class="w-full px-3 py-2 text-xs bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-none focus:outline-none focus:border-gray-400 dark:focus:border-gray-600 text-gray-900 dark:text-white transition-all">
-                        </div>
-                    `;
-                });
+                if(api.params && api.params.length > 0) {
+                    api.params.forEach(param => {
+                        inputFields += `
+                            <div class="mb-4">
+                                <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">${param} <span class="text-red-500">*</span></label>
+                                <input type="text" name="${param}" placeholder="Masukkan nilai..." oninput="updateCurl(${index})"
+                                class="w-full px-3 py-2.5 text-xs bg-white dark:bg-[#0B0F19] border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:border-blue-400 dark:focus:border-blue-500 text-gray-900 dark:text-white transition-all">
+                            </div>
+                        `;
+                    });
+                } else {
+                    inputFields = `<div class="text-xs text-gray-400 dark:text-gray-500 italic mb-4">API ini tidak membutuhkan parameter.</div>`;
+                }
 
-                // Bungkus 1 API ke dalam 1 box layout
+                // Layout Per API
                 const apiBox = document.createElement('div');
-                apiBox.className = "bg-white dark:bg-[#0E131F] border border-gray-200 dark:border-gray-800 overflow-hidden flex flex-col";
+                apiBox.className = "bg-white dark:bg-[#0E131F] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden flex flex-col shadow-sm";
                 
                 apiBox.innerHTML = `
-                    <!-- Bagian Tombol Utama / Baris yang Bisa Diklik -->
-                    <div onclick="toggleDetails(${index})" class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors select-none">
-                        <div class="flex items-center gap-3 min-w-0 pr-4">
-                            <span class="text-xs text-gray-400 font-bold">${(index + 1).toString().padStart(2, '0')}.</span>
-                            <span class="text-xs font-bold text-gray-800 dark:text-gray-300 truncate">${api.name}</span>
-                            <span class="hidden sm:inline text-[11px] text-gray-400 dark:text-gray-500 truncate">- ${api.description}</span>
+                    <!-- Header Accordion -->
+                    <div onclick="toggleDetails(${index})" class="no-tap-highlight flex items-center justify-between p-4 sm:p-5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors select-none">
+                        <div class="flex items-center gap-3 sm:gap-4 min-w-0 pr-4">
+                            <span class="text-[10px] font-bold px-2 py-1 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 shrink-0">GET</span>
+                            <span class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">${api.name}</span>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
-                            <span class="text-[9px] font-bold px-1.5 py-0.5 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-500">GET</span>
-                            <!-- Tanda Panah > -->
-                            <span id="arrow-${index}" class="text-xs font-bold text-gray-400 transition-transform duration-200 inline-block" style="transform: rotate(0deg);">&gt;</span>
+                            <span class="hidden md:inline text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded border border-gray-200 dark:border-gray-800">${api.endpoint}</span>
+                            <svg id="arrow-${index}" class="w-5 h-5 text-gray-400 transition-transform duration-300 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </div>
 
-                    <!-- Bagian Konten Detail (Awalnya Tersembunyi) -->
-                    <div id="detail-${index}" class="hidden border-t border-gray-100 dark:border-gray-800/60 p-5 bg-gray-50/30 dark:bg-black/10">
-                        <p class="sm:hidden text-xs text-gray-400 dark:text-gray-500 mb-3">${api.description}</p>
+                    <!-- Detail & Form (Awalnya Tersembunyi) -->
+                    <div id="detail-${index}" class="hidden border-t border-gray-100 dark:border-gray-800/80 p-4 sm:p-6 bg-gray-50/50 dark:bg-[#0B0F19]/30">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-5 leading-relaxed">${api.description}</p>
                         
-                        <div class="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-2.5 mb-4 text-[11px] text-gray-600 dark:text-gray-400 break-all">
-                            Link: <span class="text-gray-900 dark:text-gray-300">${api.endpoint}</span>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Bagian Kiri: Form -->
+                            <div>
+                                <h4 class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Parameter Konfigurasi</h4>
+                                <form id="${formId}" data-endpoint="${api.endpoint}" onsubmit="testAPI(event, '${api.endpoint}', '${formId}', '${resultId}', '${resultWrapId}', '${statusBadgeId}', '${copyBtnId}')">
+                                    ${inputFields}
+                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-xs transition-all shadow-md shadow-blue-500/20 active:scale-[0.98]">
+                                        KIRIM PERMINTAAN
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Bagian Kanan: cURL Display -->
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Perintah cURL</h4>
+                                    <button id="${copyCurlBtnId}" onclick="copyText(document.getElementById('curl-code-${index}').innerText, '${copyCurlBtnId}')" class="text-[10px] text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors font-bold">SALIN CURL</button>
+                                </div>
+                                <div class="w-full bg-[#1e1e1e] rounded-lg border border-gray-700 p-4 overflow-x-auto shadow-inner relative group">
+                                    <pre class="text-[11px] text-green-400 font-mono leading-relaxed" id="curl-code-${index}">curl -X GET ...</pre>
+                                </div>
+                            </div>
                         </div>
                         
-                        <form id="${formId}" onsubmit="testAPI(event, '${api.endpoint}', '${api.params.join(',')}', '${formId}', '${resultId}', '${resultWrapId}', '${copyBtnId}')">
-                            ${inputFields}
-                            <button type="submit" class="w-full bg-gray-800 hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-bold py-2 text-xs transition-all tracking-wider">
-                                JALANKAN PERMINTAAN
-                            </button>
-                        </form>
-                        
-                        <!-- Wadah Kotak Hasil Respon -->
-                        <div id="${resultWrapId}" class="mt-4 border border-gray-200 dark:border-gray-800 hidden flex flex-col">
-                            <!-- Header Kotak Hasil + Tombol Salin -->
-                            <div class="flex items-center justify-between px-3 py-1.5 bg-gray-100 dark:bg-gray-900 text-[10px] font-bold text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-gray-800 select-none">
-                                <span>HASIL RESPON:</span>
-                                <button id="${copyBtnId}" class="hover:text-gray-900 dark:hover:text-white transition-colors">SALIN</button>
+                        <!-- Wadah Kotak Hasil Respon JSON -->
+                        <div id="${resultWrapId}" class="mt-6 border border-gray-200 dark:border-gray-800 rounded-lg hidden flex flex-col overflow-hidden bg-white dark:bg-[#090C15] shadow-sm">
+                            
+                            <!-- Header Status & Action -->
+                            <div class="flex items-center justify-between px-4 py-2.5 bg-gray-50 dark:bg-[#0E131F] border-b border-gray-200 dark:border-gray-800 select-none">
+                                <div class="flex items-center gap-3 text-[10px] font-bold">
+                                    <span class="text-gray-500 dark:text-gray-400">RESPONSE</span>
+                                    <span id="${statusBadgeId}" class="px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300">...</span>
+                                </div>
+                                <button id="${copyBtnId}" class="text-[10px] font-bold text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">SALIN JSON</button>
                             </div>
-                            <!-- Isi Respon Mentah -->
-                            <div id="${resultId}" class="p-3 bg-white dark:bg-gray-950 text-[11px] text-gray-700 dark:text-gray-300 overflow-auto max-h-60">
+                            
+                            <!-- Body Respon -->
+                            <div class="p-4 overflow-auto max-h-[400px]">
+                                <pre id="${resultId}" class="text-[11px] font-mono whitespace-pre-wrap text-gray-800 dark:text-gray-300 leading-relaxed"></pre>
                             </div>
                         </div>
                     </div>
@@ -287,42 +372,67 @@
             });
         }
 
-        // Mengirim data ke API backend
-        async function testAPI(event, endpoint, paramsString, formId, resultId, resultWrapId, copyBtnId) {
+        // Eksekusi Pemanggilan API
+        async function testAPI(event, endpoint, formId, resultId, resultWrapId, statusBadgeId, copyBtnId) {
             event.preventDefault();
             const resultWrap = document.getElementById(resultWrapId);
             const resultBox = document.getElementById(resultId);
+            const statusBadge = document.getElementById(statusBadgeId);
             const copyBtn = document.getElementById(copyBtnId);
             
             resultWrap.classList.remove('hidden');
-            copyBtn.classList.add('hidden'); // Sembunyikan tombol copy saat loading
-            resultBox.innerHTML = `<span class="text-gray-400">Sedang memproses...</span>`;
+            copyBtn.classList.add('hidden'); 
+            
+            statusBadge.className = "px-2 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+            statusBadge.innerText = "Memproses...";
+            resultBox.innerHTML = `<span class="text-gray-400 animate-pulse">Menunggu respon dari server...</span>`;
 
             try {
-                const paramsArr = paramsString.split(',');
+                // Susun Parameter
+                const form = document.getElementById(formId);
+                const inputs = form.querySelectorAll('input');
                 const queryParams = new URLSearchParams();
                 
-                paramsArr.forEach(param => {
-                    if (param) {
-                        const inputElement = document.querySelector(`#${formId} [name="${param}"]`);
-                        if(inputElement) {
-                            queryParams.append(param, inputElement.value);
-                        }
+                inputs.forEach(input => {
+                    if (input.value.trim() !== '') {
+                        queryParams.append(input.name, input.value.trim());
                     }
                 });
 
-                const fullUrl = `${endpoint}?${queryParams.toString()}`;
+                const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+                const fullUrl = `${endpoint}${queryString}`;
+                
+                const startTime = performance.now();
+                
+                // Fetch Request
                 const res = await fetch(fullUrl);
+                
+                const timeTaken = Math.round(performance.now() - startTime);
+                const statusCode = res.status;
+                const statusText = res.statusText || (res.ok ? 'OK' : 'Error');
+                
+                // Set Status Badge UI
+                statusBadge.innerText = `${statusCode} ${statusText} • ${timeTaken}ms`;
+                if(res.ok) {
+                    statusBadge.className = "px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
+                } else {
+                    statusBadge.className = "px-2 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+                }
+
+                // Parsing JSON & Highlighting
                 const data = await res.json();
                 const jsonString = JSON.stringify(data, null, 2);
                 
-                resultBox.innerHTML = `<pre class="whitespace-pre-wrap text-gray-800 dark:text-gray-300">${jsonString}</pre>`;
+                resultBox.innerHTML = syntaxHighlight(jsonString);
                 
-                // Pasang fungsi copy ke tombol dan munculkan tombolnya kembali
-                copyBtn.onclick = () => copyToClipboard(jsonString, copyBtnId);
+                // Event Copy JSON
+                copyBtn.onclick = () => copyText(jsonString, copyBtnId, "SALIN JSON");
                 copyBtn.classList.remove('hidden');
+
             } catch (err) {
-                resultBox.innerHTML = `<span class="text-red-500 font-bold">Terjadi kesalahan: ${err.message}</span>`;
+                statusBadge.innerText = `ERR Connection Failed`;
+                statusBadge.className = "px-2 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+                resultBox.innerHTML = `<span class="text-red-500 font-bold">Terjadi kesalahan pada jaringan atau server: <br/>${err.message}</span>`;
             }
         }
 
@@ -341,7 +451,7 @@
             );
 
             setActiveMenu(''); 
-            document.getElementById('content-title').innerText = `Hasil Cari: "${query}"`;
+            document.getElementById('content-title').innerText = `Pencarian: "${query}"`;
             renderAPIList(matchedAPIs);
         });
 
@@ -360,24 +470,32 @@
                     return acc;
                 }, {});
 
-                const sidebar = document.getElementById('sidebar-menu');
+                const categoryList = document.getElementById('category-list');
                 
                 Object.keys(globalGroupedAPIs).forEach((type, index) => {
                     const id = `nav-cat-${index}`;
                     const btn = document.createElement('button');
                     btn.id = id;
-                    btn.className = "nav-btn w-full flex items-center justify-between px-3 py-1.5 text-xs rounded-none text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-900/40 transition-all border border-transparent cursor-pointer text-left";
+                    btn.className = "nav-btn mx-3 flex items-center justify-between px-3 py-2 text-xs rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all cursor-pointer text-left";
                     btn.innerHTML = `
-                        <span>${type}</span>
-                        <span class="text-[10px] bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400 px-1.5 font-bold">
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0"></span>
+                            <span class="truncate">${type}</span>
+                        </div>
+                        <span class="text-[9px] bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400 px-1.5 py-0.5 rounded-md font-bold shrink-0">
                             ${globalGroupedAPIs[type].length}
                         </span>
                     `;
                     btn.onclick = () => {
                         document.getElementById('search-input').value = '';
                         renderCategory(type, id);
+                        
+                        // Tutup sidebar otomatis di versi mobile saat kategori dipilih
+                        if(window.innerWidth < 768) {
+                            toggleSidebar();
+                        }
                     };
-                    sidebar.appendChild(btn);
+                    categoryList.appendChild(btn);
                 });
 
                 renderDashboard();
@@ -385,9 +503,9 @@
             } catch (error) {
                 console.error(error);
                 document.getElementById('content-body').innerHTML = `
-                    <div class="border border-gray-300 dark:border-gray-800 bg-white dark:bg-[#0E131F] p-5 text-xs text-gray-500">
-                        <span class="font-bold block text-gray-900 dark:text-white mb-1">Koneksi Gagal</span>
-                        Tidak bisa mengambil data dari server. Pastikan aplikasi backend sudah berjalan.
+                    <div class="border border-red-300 dark:border-red-800/50 bg-red-50 dark:bg-red-900/10 rounded-xl p-5 text-xs text-red-600 dark:text-red-400">
+                        <span class="font-bold block mb-1">❌ Koneksi Gagal</span>
+                        Tidak bisa mengambil data API dari server. Pastikan aplikasi backend sudah berjalan dengan benar.
                     </div>
                 `;
             }
