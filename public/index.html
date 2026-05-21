@@ -30,16 +30,18 @@
         ::-webkit-scrollbar-thumb { background: #64748b; }
         .dark ::-webkit-scrollbar-thumb { background: #334155; }
 
-        /* Mencegah highlight biru saat klik cepat pada tombol */
         .no-tap-highlight {
             -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex bg-gray-100 text-gray-800 dark:bg-[#090D16] dark:text-gray-300 transition-colors duration-300 select-none">
+<body class="h-screen w-screen overflow-hidden flex bg-gray-100 text-gray-800 dark:bg-[#090D16] dark:text-gray-300 transition-colors duration-300 select-none relative">
 
-    <!-- SIDEBAR (Ditutup Secara Default) -->
-    <aside id="sidebar-panel" class="w-0 overflow-hidden shrink-0 bg-white dark:bg-[#0E131F] flex flex-col transition-all duration-300 z-10 border-gray-200 dark:border-gray-800 border-r-0">
+    <!-- OVERLAY BLUR -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-md z-40 transition-all duration-300"></div>
+
+    <!-- SIDEBAR PANEL -->
+    <aside id="sidebar-panel" class="fixed top-0 left-0 h-full w-0 overflow-hidden bg-white dark:bg-[#0E131F] flex flex-col transition-all duration-300 z-50 border-gray-200 dark:border-gray-800 border-r-0">
         
         <!-- Header Sidebar -->
         <div class="h-[72px] flex items-center px-6 border-b border-gray-100 dark:border-gray-800 shrink-0">
@@ -57,10 +59,11 @@
             </div>
         </div>
 
-        <!-- Menu Pilihan Kategori (UI Baru) -->
+        <!-- Menu Navigasi & Kategori -->
         <div class="flex-1 overflow-y-auto pb-4 flex flex-col" id="sidebar-menu">
             <div class="px-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Navigasi</div>
-            <button onclick="renderDashboard()" id="nav-dashboard" class="nav-btn mx-3 mb-4 px-3 py-2 text-xs font-bold rounded-lg transition-all text-left flex items-center gap-2">
+            
+            <button onclick="renderDashboard(); toggleSidebar();" id="nav-dashboard" class="nav-btn mx-3 mb-4 px-3 py-2 text-xs font-bold rounded-lg transition-all text-left flex items-center gap-2">
                 <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Dashboard
             </button>
@@ -71,7 +74,7 @@
             </div>
         </div>
 
-        <!-- Bagian Footer Kaki Sidebar -->
+        <!-- Footer Sidebar -->
         <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-transparent shrink-0 text-center text-[10px] text-gray-400 dark:text-gray-600 tracking-widest font-bold">
             2026 - RinnAPIs.
         </div>
@@ -80,10 +83,9 @@
     <!-- KONTEN UTAMA -->
     <main class="flex-1 flex flex-col h-full overflow-hidden relative">
         
-        <!-- Bagian Atas Header Konten -->
+        <!-- Header Konten -->
         <header class="h-[72px] flex items-center justify-between px-6 lg:px-8 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#0E131F]/80 backdrop-blur-md shrink-0 z-20">
             <div class="flex items-center gap-4 text-xs">
-                <!-- Tombol Buka Tutup Menu Sidebar -->
                 <button onclick="toggleSidebar()" class="no-tap-highlight p-2 -ml-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 font-bold text-gray-600 dark:text-gray-400 transition-colors flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
@@ -94,10 +96,10 @@
             </div>
         </header>
 
-        <!-- Area Isi Konten (Bisa Di-scroll) -->
+        <!-- Area Konten (Scrollable) -->
         <div class="flex-1 overflow-y-auto p-6 lg:p-8 bg-gray-50 dark:bg-[#090D16]" id="main-scroll">
             <div id="content-body" class="w-full max-w-4xl mx-auto flex flex-col gap-5">
-                <!-- Konten utama akan muncul di sini -->
+                <!-- Konten dinamis disuntikkan di sini -->
             </div>
         </div>
     </main>
@@ -106,26 +108,30 @@
         let allAPIs = [];
         let globalGroupedAPIs = {};
 
-        // Pengaturan Tema Otomatis (Jika OS Dark Mode, akan ikut dark)
+        // Pengaturan Tema Otomatis
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
 
-        // Fungsi Buka-Tutup Menu Panel Sidebar
+        // Buka Tutup Sidebar
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar-panel');
+            const overlay = document.getElementById('sidebar-overlay');
+            
             if (sidebar.classList.contains('w-72')) {
                 sidebar.classList.remove('w-72', 'border-r');
                 sidebar.classList.add('w-0', 'border-r-0');
+                overlay.classList.add('hidden');
             } else {
                 sidebar.classList.remove('w-0', 'border-r-0');
                 sidebar.classList.add('w-72', 'border-r');
+                overlay.classList.remove('hidden');
             }
         }
 
-        // Tandai Menu yang Sedang Aktif
+        // Set Active Menu
         function setActiveMenu(activeId) {
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('bg-gray-200', 'text-gray-900', 'dark:bg-gray-800', 'dark:text-white');
@@ -138,30 +144,30 @@
             }
         }
 
-        // Fungsi untuk memberikan Highlight Warna pada Kode JSON
+        // Syntax Highlight JSON
         function syntaxHighlight(json) {
             if (typeof json != 'string') {
                 json = JSON.stringify(json, undefined, 2);
             }
             json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-                let cls = 'text-blue-500 dark:text-blue-400'; // number
+                let cls = 'text-blue-500 dark:text-blue-400'; 
                 if (/^"/.test(match)) {
                     if (/:$/.test(match)) {
-                        cls = 'text-purple-600 dark:text-purple-400'; // key
+                        cls = 'text-purple-600 dark:text-purple-400'; 
                     } else {
-                        cls = 'text-green-600 dark:text-green-400'; // string
+                        cls = 'text-green-600 dark:text-green-400'; 
                     }
                 } else if (/true|false/.test(match)) {
-                    cls = 'text-orange-500 dark:text-orange-400'; // boolean
+                    cls = 'text-orange-500 dark:text-orange-400'; 
                 } else if (/null/.test(match)) {
-                    cls = 'text-red-500 dark:text-red-400'; // null
+                    cls = 'text-red-500 dark:text-red-400'; 
                 }
                 return '<span class="' + cls + '">' + match + '</span>';
             });
         }
 
-        // Loading Animasi Sementara
+        // Skeleton Loading
         function renderSkeleton() {
             const contentBody = document.getElementById('content-body');
             contentBody.innerHTML = `
@@ -172,7 +178,7 @@
             `;
         }
 
-        // Tampilan Awal Dashboard
+        // Dashboard
         function renderDashboard() {
             setActiveMenu('nav-dashboard');
             document.getElementById('content-title').innerText = "Dashboard Utama";
@@ -205,7 +211,7 @@
             `;
         }
 
-        // Ganti Halaman Sesuai Kategori
+        // Render Kategori
         function renderCategory(type, id) {
             setActiveMenu(id);
             document.getElementById('content-title').innerText = `Kategori: ${type}`;
@@ -213,7 +219,7 @@
             renderAPIList(apis);
         }
 
-        // Fungsi Buka-Tutup Detail Form API (Accordion)
+        // Accordion Toggle
         function toggleDetails(index) {
             const detailBox = document.getElementById(`detail-${index}`);
             const arrow = document.getElementById(`arrow-${index}`);
@@ -221,7 +227,6 @@
             if (detailBox.classList.contains('hidden')) {
                 detailBox.classList.remove('hidden');
                 arrow.style.transform = 'rotate(180deg)';
-                // Inisiasi awal URL curl
                 updateCurl(index);
             } else {
                 detailBox.classList.add('hidden');
@@ -229,7 +234,7 @@
             }
         }
 
-        // Update URL cURL secara Real-time berdasarkan input
+        // Update cURL
         function updateCurl(index) {
             const form = document.getElementById(`form-${index}`);
             const curlCode = document.getElementById(`curl-code-${index}`);
@@ -252,7 +257,7 @@
   -H "Accept: application/json"`;
         }
 
-        // Fungsi Menyalin Teks ke Clipboard
+        // Copy to Clipboard
         function copyText(text, btnId, originalText = "SALIN") {
             navigator.clipboard.writeText(text).then(() => {
                 const copyBtn = document.getElementById(btnId);
@@ -266,7 +271,7 @@
             });
         }
 
-        // Render Daftar API
+        // Render API List
         function renderAPIList(apis) {
             const contentBody = document.getElementById('content-body');
             contentBody.innerHTML = '';
@@ -287,7 +292,6 @@
                 const copyCurlBtnId = `copy-curl-btn-${index}`;
                 const statusBadgeId = `status-${index}`;
                 
-                // Form Parameter
                 let inputFields = '';
                 if(api.params && api.params.length > 0) {
                     api.params.forEach(param => {
@@ -303,12 +307,10 @@
                     inputFields = `<div class="text-xs text-gray-400 dark:text-gray-500 italic mb-4">API ini tidak membutuhkan parameter.</div>`;
                 }
 
-                // Layout Per API
                 const apiBox = document.createElement('div');
                 apiBox.className = "bg-white dark:bg-[#0E131F] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden flex flex-col shadow-sm";
                 
                 apiBox.innerHTML = `
-                    <!-- Header Accordion -->
                     <div onclick="toggleDetails(${index})" class="no-tap-highlight flex items-center justify-between p-4 sm:p-5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors select-none">
                         <div class="flex items-center gap-3 sm:gap-4 min-w-0 pr-4">
                             <span class="text-[10px] font-bold px-2 py-1 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 shrink-0">GET</span>
@@ -320,12 +322,10 @@
                         </div>
                     </div>
 
-                    <!-- Detail & Form (Awalnya Tersembunyi) -->
                     <div id="detail-${index}" class="hidden border-t border-gray-100 dark:border-gray-800/80 p-4 sm:p-6 bg-gray-50/50 dark:bg-[#0B0F19]/30">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-5 leading-relaxed">${api.description}</p>
                         
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <!-- Bagian Kiri: Form -->
                             <div>
                                 <h4 class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Parameter Konfigurasi</h4>
                                 <form id="${formId}" data-endpoint="${api.endpoint}" onsubmit="testAPI(event, '${api.endpoint}', '${formId}', '${resultId}', '${resultWrapId}', '${statusBadgeId}', '${copyBtnId}')">
@@ -336,7 +336,6 @@
                                 </form>
                             </div>
 
-                            <!-- Bagian Kanan: cURL Display -->
                             <div>
                                 <div class="flex items-center justify-between mb-3">
                                     <h4 class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Perintah cURL</h4>
@@ -348,10 +347,7 @@
                             </div>
                         </div>
                         
-                        <!-- Wadah Kotak Hasil Respon JSON -->
                         <div id="${resultWrapId}" class="mt-6 border border-gray-200 dark:border-gray-800 rounded-lg hidden flex flex-col overflow-hidden bg-white dark:bg-[#090C15] shadow-sm">
-                            
-                            <!-- Header Status & Action -->
                             <div class="flex items-center justify-between px-4 py-2.5 bg-gray-50 dark:bg-[#0E131F] border-b border-gray-200 dark:border-gray-800 select-none">
                                 <div class="flex items-center gap-3 text-[10px] font-bold">
                                     <span class="text-gray-500 dark:text-gray-400">RESPONSE</span>
@@ -360,7 +356,6 @@
                                 <button id="${copyBtnId}" class="text-[10px] font-bold text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">SALIN JSON</button>
                             </div>
                             
-                            <!-- Body Respon -->
                             <div class="p-4 overflow-auto max-h-[400px]">
                                 <pre id="${resultId}" class="text-[11px] font-mono whitespace-pre-wrap text-gray-800 dark:text-gray-300 leading-relaxed"></pre>
                             </div>
@@ -372,7 +367,7 @@
             });
         }
 
-        // Eksekusi Pemanggilan API
+        // Test API
         async function testAPI(event, endpoint, formId, resultId, resultWrapId, statusBadgeId, copyBtnId) {
             event.preventDefault();
             const resultWrap = document.getElementById(resultWrapId);
@@ -387,8 +382,9 @@
             statusBadge.innerText = "Memproses...";
             resultBox.innerHTML = `<span class="text-gray-400 animate-pulse">Menunggu respon dari server...</span>`;
 
+            const startTime = performance.now();
+
             try {
-                // Susun Parameter
                 const form = document.getElementById(formId);
                 const inputs = form.querySelectorAll('input');
                 const queryParams = new URLSearchParams();
@@ -402,30 +398,22 @@
                 const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
                 const fullUrl = `${endpoint}${queryString}`;
                 
-                const startTime = performance.now();
-                
-                // Fetch Request
                 const res = await fetch(fullUrl);
-                
-                const timeTaken = Math.round(performance.now() - startTime);
-                const statusCode = res.status;
                 const statusText = res.statusText || (res.ok ? 'OK' : 'Error');
+                const timeTaken = Math.round(performance.now() - startTime);
+
+                statusBadge.innerText = `${res.status} ${statusText} • ${timeTaken}ms`;
                 
-                // Set Status Badge UI
-                statusBadge.innerText = `${statusCode} ${statusText} • ${timeTaken}ms`;
                 if(res.ok) {
                     statusBadge.className = "px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
                 } else {
                     statusBadge.className = "px-2 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
                 }
 
-                // Parsing JSON & Highlighting
                 const data = await res.json();
                 const jsonString = JSON.stringify(data, null, 2);
                 
                 resultBox.innerHTML = syntaxHighlight(jsonString);
-                
-                // Event Copy JSON
                 copyBtn.onclick = () => copyText(jsonString, copyBtnId, "SALIN JSON");
                 copyBtn.classList.remove('hidden');
 
@@ -436,7 +424,7 @@
             }
         }
 
-        // Logika Kolom Pencarian
+        // Search
         document.getElementById('search-input').addEventListener('input', function(e) {
             const query = e.target.value.toLowerCase();
             if(query.trim() === '') {
@@ -455,7 +443,7 @@
             renderAPIList(matchedAPIs);
         });
 
-        // Ambil Data Utama dari Server
+        // Load APIs
         async function loadAPIs() {
             renderSkeleton();
             
@@ -471,6 +459,7 @@
                 }, {});
 
                 const categoryList = document.getElementById('category-list');
+                categoryList.innerHTML = '';
                 
                 Object.keys(globalGroupedAPIs).forEach((type, index) => {
                     const id = `nav-cat-${index}`;
@@ -489,11 +478,7 @@
                     btn.onclick = () => {
                         document.getElementById('search-input').value = '';
                         renderCategory(type, id);
-                        
-                        // Tutup sidebar otomatis di versi mobile saat kategori dipilih
-                        if(window.innerWidth < 768) {
-                            toggleSidebar();
-                        }
+                        toggleSidebar();
                     };
                     categoryList.appendChild(btn);
                 });
@@ -505,7 +490,7 @@
                 document.getElementById('content-body').innerHTML = `
                     <div class="border border-red-300 dark:border-red-800/50 bg-red-50 dark:bg-red-900/10 rounded-xl p-5 text-xs text-red-600 dark:text-red-400">
                         <span class="font-bold block mb-1">❌ Koneksi Gagal</span>
-                        Tidak bisa mengambil data API dari server. Pastikan aplikasi backend sudah berjalan dengan benar.
+                        Tidak bisa mengambil data struktur daftar API dari server. Pastikan aplikasi server backend lokal Anda sudah dinyalakan dengan benar.
                     </div>
                 `;
             }
